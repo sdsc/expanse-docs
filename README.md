@@ -31,7 +31,7 @@ for editing. Content fixes are welcome — the source lives in [`docs/`](docs/).
 npm install
 npm run start    # dev server at http://localhost:3000
 npm run build    # production build in build/
-npm run serve    # serve the production build locally
+npm run serve    # serve the production build locally (test B)
 ```
 
 ## Deployment
