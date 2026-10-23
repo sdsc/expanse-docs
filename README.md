@@ -4,7 +4,7 @@ A Docusaurus rebuild of the [SDSC Expanse User Guide](https://www.sdsc.edu/syste
 with all original content preserved and reorganized into a searchable docs site styled with
 [SDSC branding](https://www.sdsc.edu/about/brand.html) (navy `#182B49`, gold `#C69214`, Teko + Source Sans 3).
 
-**Live site:** https://sdsc-scicomp.github.io/expanse-docusaurus/
+**Live site:** https://sdsc.github.io/expanse-docs/
 
 ## Contents
 
@@ -42,6 +42,6 @@ GitHub Pages). A separate [Lighthouse workflow](.github/workflows/lighthouse.yml
 audits every page for accessibility (all pages currently score **100**).
 
 Every pull request automatically gets a temporary preview at
-`https://sdsc-scicomp.github.io/expanse-docusaurus/pr-preview/pr-<number>/`, posted
+`https://sdsc.github.io/expanse-docs/pr-preview/pr-<number>/`, posted
 as a comment on the PR. The preview updates on each push and is removed when
 the PR is closed or merged ([preview workflow](.github/workflows/pr-preview.yml)).

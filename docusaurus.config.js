@@ -8,7 +8,7 @@ import { visit } from "unist-util-visit";
 
 // PR preview builds serve the site under /pr-preview/pr-<number>/, so the
 // base URL is overridable at build time (see .github/workflows/pr-preview.yml).
-const baseUrl = process.env.BASE_URL || "/expanse-docusaurus/";
+const baseUrl = process.env.BASE_URL || "/expanse-docs/";
 
 /**
  * Wrap markdown tables in a scrollable div so wide tables scroll
@@ -44,10 +44,10 @@ const config = {
   favicon: "img/favicon.ico",
 
   // GitHub Pages deployment config
-  url: "https://zonca.github.io",
+  url: "https://sdsc.github.io",
   baseUrl: baseUrl,
-  organizationName: "zonca",
-  projectName: "expanse-docusaurus",
+  organizationName: "sdsc",
+  projectName: "expanse-docs",
 
   onBrokenLinks: "throw",
 
@@ -66,7 +66,7 @@ const config = {
           sidebarPath: "./sidebars.js",
           // Adds an "Edit this page" button on every doc page,
           // linking straight to the file on GitHub
-          editUrl: "https://github.com/zonca/expanse-docusaurus/edit/main/",
+          editUrl: "https://github.com/sdsc/expanse-docs/edit/main/",
           rehypePlugins: [rehypeWrapTables],
         },
         blog: false,
@@ -122,7 +122,7 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/zonca/expanse-docusaurus",
+                href: "https://github.com/sdsc/expanse-docs",
               },
               {
                 label: "SDSC Support",
