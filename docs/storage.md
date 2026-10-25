@@ -28,7 +28,7 @@ The compute nodes on _Expanse_ have access to fast flash storage. There is 1TB o
 
 ## Parallel Lustre Filesystems
 
-In addition to the local scratch storage, users will have access to global parallel filesystems on _Expanse_. Every _Expanse_ node has access to a 12 PB Lustre parallel file system (provided by Aeon Computing) and a 7 PB Ceph Object Store system, 140 GB/second performance storage. SDSC limits the number of files that can be stored in the `/lustre/scratch` filesystem to 2 million files per user. Users should contact support for assistance at the [ACCESS Help Desk](https://access-ci.atlassian.net/wiki/spaces/ACCESSdocumentation/pages/72417292) if their workflow requires extensive small I/O, to avoid causing system issues assosicated with load on the metadata server.
+In addition to the local scratch storage, users will have access to global parallel filesystems on _Expanse_. Every _Expanse_ node has access to a 12 PB Lustre parallel file system (provided by Aeon Computing) and a 7 PB Ceph Object Store system, 140 GB/second performance storage. SDSC limits the number of files that can be stored in the `/lustre/scratch` filesystem to 2 million files per user. Users should contact support for assistance at the [ACCESS Help Desk](https://access-ci.atlassian.net/wiki/spaces/ACCESSdocumentation/pages/72417292) if their workflow requires extensive small I/O, to avoid causing system issues associated with load on the metadata server.
 
 The two Lustre filesystems available on _Expanse_ are:
 
