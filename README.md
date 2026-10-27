@@ -52,3 +52,5 @@ Every pull request automatically gets a temporary preview at
 `https://sdsc.github.io/expanse-docs/pr-preview/pr-<number>/`, posted
 as a comment on the PR. The preview updates on each push and is removed when
 the PR is closed or merged ([preview workflow](.github/workflows/pr-preview.yml)).
+Preview removal does not wait for the GitHub Pages build (it would race with
+the main-branch deploy triggered by the same merge).
