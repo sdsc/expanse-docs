@@ -89,7 +89,7 @@ srun --mpi=pmi2 -n 256 ../hello_mpi
 ```
 
 - _Expanse requires users to enter a valid project name; users can list valid project by running the `expanse-client` script._
-- _Expanse requires users to include memory , by using --mem=0 for compute partition the job will be allocated all the avialble memory on the node_
+- _Expanse requires users to include memory, by using --mem=0 for compute partition the job will be allocated all the available memory on the node_
 
 ### Basic OpenMP Job
 

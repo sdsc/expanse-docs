@@ -37,7 +37,7 @@ The two Lustre filesystems available on _Expanse_ are:
 
 ### Submitting Jobs Using Lustre
 
-Jobs that need to use the Lustre filesystem should explicitly reqeust the feature by including the following line to their script:
+Jobs that need to use the Lustre filesystem should explicitly request the feature by including the following line to their script:
 
 ```bash
 #SBATCH --constraint="lustre"
