@@ -45,6 +45,13 @@ jobs:
       # Deploys the preview on opened/reopened/synchronize and removes it on
       # close (merged or not). Leaves a sticky comment on the PR with the
       # preview URL once the GitHub Pages deployment is live.
+      #
+      # wait-for-pages-deployment is enabled only for deploys: on close, the
+      # removal races with the main-branch deploy (a merge triggers both this
+      # workflow and deploy.yml, both pushing to gh-pages), and the wait step
+      # sees the concurrent GitHub Pages build as "errored" and fails the run
+      # even though the removal itself succeeded (seen on PRs #7 and #8).
+      # Nothing depends on the removal's Pages build, so it is not awaited.
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
@@ -52,4 +59,4 @@ jobs:
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           qr-code: false
-          wait-for-pages-deployment: true
+          wait-for-pages-deployment: ${{ github.event.action != 'closed' }}
