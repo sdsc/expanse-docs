@@ -6,6 +6,13 @@ with all original content preserved and reorganized into a searchable docs site 
 
 **Live site:** https://sdsc.github.io/expanse-docs/
 
+## Search
+
+The site ships with full-text search in the navbar
+([@easyops-cn/docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local)):
+a fully offline search index built at deploy time, no external service
+(no Algolia account or crawler needed). The index covers all 14 guide pages.
+
 ## Contents
 
 All 14 sections of the original guide, organized by topic:
