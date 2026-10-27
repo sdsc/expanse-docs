@@ -48,6 +48,10 @@ which builds the site and publishes it to the `gh-pages` branch (served by
 GitHub Pages). A separate [Lighthouse workflow](.github/workflows/lighthouse.yml)
 audits every page for accessibility (all pages currently score **100**).
 
+External links are guarded by the [broken-links workflow](.github/workflows/broken-links.yml)
+(lychee): it runs on changes to the docs, weekly on a Monday-morning schedule,
+and on demand.
+
 Every pull request automatically gets a temporary preview at
 `https://sdsc.github.io/expanse-docs/pr-preview/pr-<number>/`, posted
 as a comment on the PR. The preview updates on each push and is removed when

@@ -1,0 +1,63 @@
+name: Broken Links
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "README.md"
+      - ".github/workflows/broken-links.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "README.md"
+      - ".github/workflows/broken-links.yml"
+  schedule:
+    # Weekly: Mondays 09:00 America/Los_Angeles (16:00/17:00 UTC, DST-dependent)
+    - cron: "0 16 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: broken-links-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Checks every hyperlink in docs/ and README.md with lychee.
+      # Internal doc links are already enforced at build time
+      # (onBrokenLinks: "throw" in docusaurus.config.js); this workflow
+      # guards against external link rot, both on changes and weekly.
+      #
+      # Excludes (verified against the current content, see PR):
+      # - portal.expanse.sdsc.edu: the portal serves a mismatched TLS
+      #   intermediate chain (leaf issued by "InCommon RSA OV SSL CA 3"
+      #   but the presented intermediate is "InCommon RSA Server CA 2"),
+      #   so non-browser clients reject the certificate. Browsers accept
+      #   it via AIA fetching. Re-check once the portal chain is fixed.
+      # - dl.acm.org, doi.org/10.1145, software.intel.com: all return
+      #   403 to every server-side client (bot walls, confirmed with a
+      #   browser user agent); these links cannot be verified
+      #   programmatically and work in browsers.
+      # - mailto: not checked (lychee default).
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          lycheeVersion: v0.24.2
+          args: >-
+            --no-progress
+            --max-retries 2
+            --exclude 'portal\.expanse\.sdsc\.edu'
+            --exclude '^https://(dl\.acm\.org|doi\.org/10\.1145)/'
+            --exclude '^https://software\.intel\.com/'
+            './docs/**/*.md'
+            README.md
+          fail: true
