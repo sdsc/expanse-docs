@@ -30,15 +30,15 @@ ssh -l <your_username> login.expanse.sdsc.edu
   - You can use ssh-agent or keychain to avoid repeatedly typing the private key password.
   - Hosts which connect to SSH more frequently than ten times per minute may get blocked for a short period of time
 - Do not use the login nodes for computationally intensive processes, as hosts for running workflow management tools, as primary data transfer nodes for large or numerous data transfers or as servers providing other services accessible to the Internet. The login nodes are meant for file editing, simple data analysis, and other tasks that use minimal compute resources. All computationally demanding jobs should be submitted and run through the batch queuing system.
-- Login nodes are not the same as the batch nodes, Users should request an interactive sessions to compile programs.
+- Login nodes are not the same as the batch nodes, Users should request interactive sessions to compile programs.
 
-## 2FA with Authenticator Authenticator (Required)
+## 2FA with Authenticator (Required)
 
 _Expanse_ uses two-factor authentication (2FA) when using a password to log in. 2FA adds a layer of security to your authentication process.
 
 ### Install Authenticator App:
 
-Users will first need to Install an authenticator app on their smartphone or other device. Users can use any app that supports importing TOTP 2FA codes with a QR code. (Google Authenticator, DUO Mobile App, LastPass Authenticator App, etc) We suggest using the Google Authenticator app if you do not an athenticator application already istalled on your mobile device.
+Users will first need to Install an authenticator app on their smartphone or other device. Users can use any app that supports importing TOTP 2FA codes with a QR code. (Google Authenticator, DUO Mobile App, LastPass Authenticator App, etc) We suggest using the Google Authenticator app if you do not have an authenticator application already installed on your mobile device.
 
 [Google Authenticator for Apple IOS](https://apps.apple.com/us/app/google-authenticator/id388497605)
 
@@ -55,7 +55,7 @@ Once the authenticator app has been installed, users will need to enroll and pai
 
    **I have an invitation** - Select if you are **NOT** an ACCESS allocated user. You will need to contact SDSC support at [consult@sdsc.edu](mailto:consult@sdsc.edu) to receive an invitation.
 
-3. Once logged in you can manage your 2FA enrollment. Click on the “Manage 2FA” button and follow the instructions to scan the QR code. Once the pairing is complete you can close the browser. (_NOTE: This change make take up to 15 minutes to update on the system_)
+3. Once logged in you can manage your 2FA enrollment. Click on the “Manage 2FA” button and follow the instructions to scan the QR code. Once the pairing is complete you can close the browser. (_NOTE: This change may take up to 15 minutes to update on the system_)
 4. You can login to Expanse using any ssh client. For example, from a terminal window on a Mac you can do:
 
 ```bash

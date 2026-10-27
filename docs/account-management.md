@@ -18,7 +18,7 @@ The script uses the 'sdsc' module, which is loaded by default.
 [user@login01 ~]$ module load sdsc
 ```
 
-To review your available projects on Expanse resource use the 'user' parameter and '-r' to desginate a resource. If no resouce is designated expanse data will be shown by default.
+To review your available projects on Expanse resource use the 'user' parameter and '-r' to designate a resource. If no resource is designated expanse data will be shown by default.
 
 ```bash
 [user@login01 ~]$ expanse-client user -r expanse
