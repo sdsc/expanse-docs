@@ -42,7 +42,7 @@ Users will first need to Install an authenticator app on their smartphone or oth
 
 [Google Authenticator for Apple IOS](https://apps.apple.com/us/app/google-authenticator/id388497605)
 
-[Google Authenticator for Android](https://authenticator.en.uptodown.com/android)
+[Google Authenticator for Android](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)
 
 Once the authenticator app has been installed, users will need to enroll and pair the 2FA device with their _Expanse_ Account.
 
