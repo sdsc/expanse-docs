@@ -31,9 +31,17 @@ jobs:
           mkdir -p lighthouse-site
           cp -r build lighthouse-site/expanse-docs
 
+      # Lighthouse CI runs from the pinned @lhci/cli devDependency instead
+      # of a third-party action wrapper. The runner's preinstalled Chrome
+      # is used via CHROME_PATH.
       - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: npx --no-install lhci autorun --config=./lighthouserc.json
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v7
         with:
-          configPath: "./lighthouserc.json"
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          name: lighthouse-reports
+          path: .lighthouseci
+          retention-days: 7
