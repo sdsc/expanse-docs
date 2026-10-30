@@ -1,11 +1,10 @@
 name: Broken Links
 
 on:
+  # Runs on every PR: also a required status check for branch protection,
+  # so it must always report (a path-filtered required check never
+  # reports on non-matching PRs and blocks merge).
   pull_request:
-    paths:
-      - "docs/**"
-      - "README.md"
-      - ".github/workflows/broken-links.yml"
   push:
     branches:
       - main
@@ -26,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  broken-links:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
