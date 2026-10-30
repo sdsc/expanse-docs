@@ -31,6 +31,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # lychee is downloaded from its GitHub release, pinned by version and
+      # checksum, instead of running it through a third-party action wrapper.
+      - name: Install lychee (pinned release)
+        run: |
+          set -euo pipefail
+          curl -sSfL -o lychee.tar.gz \
+            "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz"
+          echo "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a  lychee.tar.gz" | sha256sum --check --strict -
+          mkdir -p .lychee-bin
+          tar -xzf lychee.tar.gz -C .lychee-bin --strip-components=1
+          .lychee-bin/lychee --version
+
       # Checks every hyperlink in docs/ and README.md with lychee.
       # Internal doc links are already enforced at build time
       # (onBrokenLinks: "throw" in docusaurus.config.js); this workflow
@@ -48,15 +60,12 @@ jobs:
       #   programmatically and work in browsers.
       # - mailto: not checked (lychee default).
       - name: Check links
-        uses: lycheeverse/lychee-action@v2
-        with:
-          lycheeVersion: v0.24.2
-          args: >-
-            --no-progress
-            --max-retries 2
-            --exclude 'portal\.expanse\.sdsc\.edu'
-            --exclude '^https://(dl\.acm\.org|doi\.org/10\.1145)/'
-            --exclude '^https://software\.intel\.com/'
-            './docs/**/*.md'
+        run: |
+          .lychee-bin/lychee \
+            --no-progress \
+            --max-retries 2 \
+            --exclude 'portal\.expanse\.sdsc\.edu' \
+            --exclude '^https://(dl\.acm\.org|doi\.org/10\.1145)/' \
+            --exclude '^https://software\.intel\.com/' \
+            './docs/**/*.md' \
             README.md
-          fail: true
