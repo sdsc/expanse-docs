@@ -39,8 +39,9 @@ jobs:
           curl -sSfL -o lychee.tar.gz \
             "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz"
           echo "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a  lychee.tar.gz" | sha256sum --check --strict -
-          tar -xzf lychee.tar.gz
-          ./lychee --version
+          mkdir -p .lychee-bin
+          tar -xzf lychee.tar.gz -C .lychee-bin --strip-components=1
+          .lychee-bin/lychee --version
 
       # Checks every hyperlink in docs/ and README.md with lychee.
       # Internal doc links are already enforced at build time
@@ -60,7 +61,7 @@ jobs:
       # - mailto: not checked (lychee default).
       - name: Check links
         run: |
-          ./lychee \
+          .lychee-bin/lychee \
             --no-progress \
             --max-retries 2 \
             --exclude 'portal\.expanse\.sdsc\.edu' \
