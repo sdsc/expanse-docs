@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">System Access | Expanse User Guide</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://sdsc.github.io/expanse-docs/system-access"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="System Access | Expanse User Guide"><meta data-rh="true" name="description" content="Obtaining an Expanse account, logging in with SSH and 2FA, and using the Expanse User Portal."><meta data-rh="true" property="og:description" content="Obtaining an Expanse account, logging in with SSH and 2FA, and using the Expanse User Portal."><link data-rh="true" rel="icon" href="/expanse-docs/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://sdsc.github.io/expanse-docs/system-access"><link data-rh="true" rel="alternate" href="https://sdsc.github.io/expanse-docs/system-access" hreflang="en"><link data-rh="true" rel="alternate" href="https://sdsc.github.io/expanse-docs/system-access" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Access","item":"https://sdsc.github.io/expanse-docs/system-access"}]}</script><link rel="stylesheet" href="/expanse-docs/assets/css/styles.04e8be73.css">
-<script src="/expanse-docs/assets/js/runtime~main.aefe0e2c.js" defer="defer"></script>
+<script src="/expanse-docs/assets/js/runtime~main.bdea4524.js" defer="defer"></script>
 <script src="/expanse-docs/assets/js/main.c97e24b4.js" defer="defer"></script>
 </head>
 <body>
@@ -38,22 +38,9 @@
 <p><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" rel="noopener noreferrer" class="">Google Authenticator for Android</a></p>
 <p>Once the authenticator app has been installed, users will need to enroll and pair the 2FA device with their <em>Expanse</em> Account.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="to-enroll">To enroll:<a href="#to-enroll" class="hash-link" aria-label="Direct link to To enroll:" title="Direct link to To enroll:" translate="no">​</a></h3>
-<ol>
-<li class="">
-<p>Go to the website <a href="https://passive.sdsc.edu" target="_blank" rel="noopener noreferrer" class="">https://passive.sdsc.edu</a></p>
-</li>
-<li class="">
-<p>Select the appropriate option:</p>
-<p><strong>Login using Globus</strong> – Select if you are an ACCESS allocated user. You will be redirected to the Globus OpenID connect authorization site. Please choose ACCESS CI as the organization (<em>not</em> your home institution).</p>
-<p><strong>I have an invitation</strong> - Select if you are <strong>NOT</strong> an ACCESS allocated user. You will need to contact SDSC support at <a href="mailto:consult@sdsc.edu" target="_blank" rel="noopener noreferrer" class="">consult@sdsc.edu</a> to receive an invitation.</p>
-</li>
-<li class="">
-<p>Once logged in you can manage your 2FA enrollment. Click on the “Manage 2FA” button and follow the instructions to scan the QR code. Once the pairing is complete you can close the browser. (<em>NOTE: This change may take up to 15 minutes to update on the system</em>)</p>
-</li>
-<li class="">
-<p>You can login to Expanse using any ssh client. For example, from a terminal window on a Mac you can do:</p>
-</li>
-</ol>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>The SDSC 2FA enrollment portal is unavailable until further notice. SDSC User Services will announce when it is back.</p></div></div>
+<p>In the meantime, new users can access <em>Expanse</em> through the <a href="https://portal.expanse.sdsc.edu" target="_blank" rel="noopener noreferrer" class="">Expanse User Portal</a> by choosing ACCESS CI as the organization and logging in with their ACCESS credentials, which use DUO for 2FA. Users who are not on ACCESS and need an invitation should contact <a href="mailto:consult@sdsc.edu" target="_blank" rel="noopener noreferrer" class="">consult@sdsc.edu</a>.</p>
+<p>Users who have already enrolled 2FA can log in to <em>Expanse</em> with any ssh client. For example, from a terminal window on a Mac you can do:</p>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">ssh &lt;your_username&gt;@login.expanse.sdsc.edu</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">ssh -l &lt;your_username&gt; login.expanse.sdsc.edu</span><br></div></code></pre></div></div>
 <p>You will either be prompted for a password (for ACCESS users this is their ACCESS portal password) followed by a prompt for the TOTP number from your authenticator app OR if you have a ssh key in place on Expanse, and the corresponding private key loaded in your ssh-agent, you will skip straight to the prompt for your TOTP code.</p>
 <p><em>Note: If you already enrolled in 2FA before Feb 24, 2025, you do not need to re-enroll as we will incorporate your existing 2FA information into the new setup</em>.</p>
