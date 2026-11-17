@@ -73,7 +73,11 @@ runs:
               return 0
             fi
             git fetch --force origin "$PREVIEW_BRANCH"
-            git -C "$WORK" rebase "origin/$PREVIEW_BRANCH"
+            if ! git -C "$WORK" rebase "origin/$PREVIEW_BRANCH"; then
+              git -C "$WORK" rebase --abort || true
+              echo "::error::Rebase conflict while updating $PREVIEW_BRANCH"
+              return 1
+            fi
           done
           echo "::error::Failed to push to $PREVIEW_BRANCH after 3 attempts"
           return 1
@@ -83,6 +87,9 @@ runs:
           rm -rf "$WORK/$PREVIEW_PATH"
           mkdir -p "$WORK/$PREVIEW_PATH"
           cp -R "$GITHUB_WORKSPACE/$SOURCE_DIR/." "$WORK/$PREVIEW_PATH/"
+          # Lets the comment step wait for this exact build instead of any
+          # 200 on the preview URL, which a previous build already satisfies.
+          echo "$GITHUB_SHA" > "$WORK/$PREVIEW_PATH/pr-preview-version.txt"
         else
           rm -rf "$WORK/$PREVIEW_PATH"
         fi
@@ -104,26 +111,52 @@ runs:
         fi
 
     - name: Comment preview URL on the PR
-      if: inputs.action == 'deploy'
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
         PR_NUMBER: ${{ github.event.number }}
         PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
+        ACTION_MODE: ${{ inputs.action }}
+        GITHUB_SHA: ${{ github.sha }}
       run: |
         set -euo pipefail
 
-        # The Pages build takes about a minute; wait a bit so the comment
-        # does not advertise a 404. Best effort: comment after 4 minutes
-        # even if the build is still running.
-        code=000
+        # Locate the sticky comment once, for both deploy and remove.
+        # Capture all ids first and read the first line, so gh never gets
+        # SIGPIPE (which pipefail would turn into a failure) on busy PRs.
+        COMMENTS=$(gh api --paginate "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+          --jq '.[] | select(.body | contains("<!-- pr-preview-url -->")) | .id')
+        COMMENT_ID=""
+        if [ -n "$COMMENTS" ]; then
+          IFS= read -r COMMENT_ID <<< "$COMMENTS"
+        fi
+
+        if [ "$ACTION_MODE" = "remove" ]; then
+          BODY="Preview removed.
+        <!-- pr-preview-url -->"
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$BODY" > /dev/null
+          fi
+          exit 0
+        fi
+
+        # The Pages build takes about a minute. Poll the version file that
+        # deploy wrote into the preview, so a previously deployed preview
+        # does not satisfy the wait on synchronize. Best effort: comment
+        # after 4 minutes even if the build is still running.
+        published=""
         for attempt in $(seq 1 48); do
-          code=$(curl -s -o /dev/null -w '%{http_code}' "$PREVIEW_URL" || true)
-          [ "$code" = "200" ] && break
+          url="$PREVIEW_URL/pr-preview-version.txt?v=$(date +%s)-$attempt"
+          body=$(curl -fsS "$url" 2>/dev/null || true)
+          if [ "$body" = "$GITHUB_SHA" ]; then
+            published=1
+            break
+          fi
           sleep 5
         done
-        if [ "$code" = "200" ]; then
+        if [ -n "$published" ]; then
           BODY="Preview: $PREVIEW_URL"
         else
           BODY="Preview (Pages build may still be running): $PREVIEW_URL"
@@ -131,9 +164,6 @@ runs:
         BODY="$BODY
         <!-- pr-preview-url -->"
 
-        # Update the existing comment if there is one, otherwise create it.
-        COMMENT_ID=$(gh api --paginate "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
-          --jq ".[] | select(.body | contains(\"<!-- pr-preview-url -->\")) | .id" | head -1)
         if [ -n "$COMMENT_ID" ]; then
           gh api --method PATCH "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
             -f body="$BODY" > /dev/null

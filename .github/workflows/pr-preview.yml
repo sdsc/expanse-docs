@@ -58,3 +58,4 @@ jobs:
         uses: ./.github/actions/pr-preview
         with:
           action: remove
+          pages-base-url: https://sdsc.github.io/expanse-docs

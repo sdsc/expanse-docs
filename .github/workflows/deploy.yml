@@ -45,7 +45,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch --force origin gh-pages
           git worktree add --detach "$RUNNER_TEMP/pages" origin/gh-pages
-          rsync -a --delete --exclude='pr-preview' build/ "$RUNNER_TEMP/pages/"
+          rsync -a --delete --exclude='.git' --exclude='pr-preview' build/ "$RUNNER_TEMP/pages/"
           cd "$RUNNER_TEMP/pages"
           git add -A
           if git diff --cached --quiet; then
@@ -58,7 +58,11 @@ jobs:
               exit 0
             fi
             git fetch --force origin gh-pages
-            git rebase origin/gh-pages
+            if ! git rebase origin/gh-pages; then
+              git rebase --abort || true
+              echo "::error::Rebase conflict while updating gh-pages"
+              exit 1
+            fi
           done
           echo "::error::Failed to push to gh-pages after 3 attempts"
           exit 1
