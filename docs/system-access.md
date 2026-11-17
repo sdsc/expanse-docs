@@ -48,15 +48,15 @@ Once the authenticator app has been installed, users will need to enroll and pai
 
 ### To enroll:
 
-1. Go to the website [https://passive.sdsc.edu](https://passive.sdsc.edu)
-2. Select the appropriate option:
+:::warning
 
-   **Login using Globus** – Select if you are an ACCESS allocated user. You will be redirected to the Globus OpenID connect authorization site. Please choose ACCESS CI as the organization (_not_ your home institution).
+The SDSC 2FA enrollment portal is unavailable until further notice. SDSC User Services will announce when it is back.
 
-   **I have an invitation** - Select if you are **NOT** an ACCESS allocated user. You will need to contact SDSC support at [consult@sdsc.edu](mailto:consult@sdsc.edu) to receive an invitation.
+:::
 
-3. Once logged in you can manage your 2FA enrollment. Click on the “Manage 2FA” button and follow the instructions to scan the QR code. Once the pairing is complete you can close the browser. (_NOTE: This change may take up to 15 minutes to update on the system_)
-4. You can login to Expanse using any ssh client. For example, from a terminal window on a Mac you can do:
+In the meantime, new users can access _Expanse_ through the [Expanse User Portal](https://portal.expanse.sdsc.edu) by choosing ACCESS CI as the organization and logging in with their ACCESS credentials, which use DUO for 2FA. Users who are not on ACCESS and need an invitation should contact [consult@sdsc.edu](mailto:consult@sdsc.edu).
+
+Users who have already enrolled 2FA can log in to _Expanse_ with any ssh client. For example, from a terminal window on a Mac you can do:
 
 ```bash
 ssh <your_username>@login.expanse.sdsc.edu
