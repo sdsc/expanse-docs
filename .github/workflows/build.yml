@@ -2,6 +2,9 @@ name: Build
 
 on:
   pull_request:
+  # merge_group keeps the required check reporting if a merge queue is
+  # ever enabled on this repository.
+  merge_group:
   push:
     branches:
       - main

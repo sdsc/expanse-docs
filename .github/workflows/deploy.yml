@@ -15,6 +15,9 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    # workflow_dispatch can be triggered on any branch from the Actions UI;
+    # only main may ever be published to the production site.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,9 +46,24 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch --force origin gh-pages
-          git worktree add --detach "$RUNNER_TEMP/pages" origin/gh-pages
-          rsync -a --delete --exclude='.git' --exclude='pr-preview' build/ "$RUNNER_TEMP/pages/"
+          # gh-pages may not exist yet (fresh repository, or it was
+          # recreated): tolerate the missing ref and start an orphan branch.
+          git fetch --force origin gh-pages || true
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add --detach "$RUNNER_TEMP/pages" origin/gh-pages
+          else
+            git worktree add --detach "$RUNNER_TEMP/pages"
+            git -C "$RUNNER_TEMP/pages" checkout --orphan gh-pages
+            git -C "$RUNNER_TEMP/pages" rm -rf --quiet . || true
+          fi
+          # --delete prunes files from the previous deploy, but never the
+          # worktree's .git, the PR preview directories, or the Pages-managed
+          # special files (CNAME for a custom domain, .nojekyll).
+          rsync -a --delete --exclude='.git' --exclude='pr-preview' \
+            --exclude='CNAME' --exclude='.nojekyll' \
+            build/ "$RUNNER_TEMP/pages/"
+          # Serve the branch without running Jekyll over it (also faster).
+          touch "$RUNNER_TEMP/pages/.nojekyll"
           cd "$RUNNER_TEMP/pages"
           git add -A
           if git diff --cached --quiet; then
