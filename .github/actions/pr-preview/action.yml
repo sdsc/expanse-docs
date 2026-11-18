@@ -36,6 +36,8 @@ runs:
       id: deploy
       shell: bash
       env:
+        GH_TOKEN: ${{ github.token }}
+        REPOSITORY: ${{ github.repository }}
         PR_NUMBER: ${{ github.event.number }}
         ACTION_MODE: ${{ inputs.action }}
         SOURCE_DIR: ${{ inputs.source-dir }}
@@ -103,6 +105,15 @@ runs:
           else
             git -C "$WORK" commit -m "Remove preview for PR #$PR_NUMBER"
           fi
+          if [ "$ACTION_MODE" = "deploy" ]; then
+            # A synchronize run can reach this point after the PR closed and
+            # its removal already ran: do not recreate the preview.
+            PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+            if [ "$PR_STATE" != "open" ]; then
+              echo "PR #$PR_NUMBER is $PR_STATE; skipping preview push."
+              exit 0
+            fi
+          fi
           push_with_retry
         fi
 
@@ -121,6 +132,16 @@ runs:
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set -euo pipefail
+
+        # Do not comment on a preview when the PR closed while the deploy
+        # was running; the removal run updates the comment instead.
+        if [ "$ACTION_MODE" = "deploy" ]; then
+          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          if [ "$PR_STATE" != "open" ]; then
+            echo "PR #$PR_NUMBER is $PR_STATE; not commenting on a preview."
+            exit 0
+          fi
+        fi
 
         # Locate the sticky comment once, for both deploy and remove.
         # Capture all ids first and read the first line, so gh never gets
