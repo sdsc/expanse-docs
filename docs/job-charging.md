@@ -22,4 +22,4 @@ The charge unit for all SDSC machines, including Expanse, is the Service Unit (S
 - Multicore jobs will scale according to resource utilization
 - Each large memory node has ~2 TB of memory and 128 cores
   - By default the system will only allocate 1 GB of memory per core, explicitly use the `--mem` directive to request additional memory
-  - Max. memory per large memory node `--mem = 2055638M`
+  - Max. memory per large memory node `--mem = 2000G`

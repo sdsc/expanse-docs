@@ -3,7 +3,7 @@
     "collect": {
       "staticDistDir": "./lighthouse-site",
       "maxAutodiscoverUrls": 50,
-      "autodiscoverUrlBlocklist": ["/expanse-docusaurus/404.html"],
+      "autodiscoverUrlBlocklist": ["/expanse-docs/404.html"],
       "numberOfRuns": 1,
       "settings": {
         "chromeFlags": "--headless=new --no-sandbox --disable-dev-shm-usage",

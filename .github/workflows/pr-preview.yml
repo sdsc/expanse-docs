@@ -27,7 +27,7 @@ jobs:
         if: github.event.action != 'closed'
         uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 26
           cache: npm
 
       - name: Install dependencies
@@ -35,21 +35,27 @@ jobs:
         run: npm ci
 
       # Build the PR with the preview base URL so that assets and internal
-      # links resolve under /expanse-docusaurus/pr-preview/pr-<number>/
+      # links resolve under /expanse-docs/pr-preview/pr-<number>/
       - name: Build website
         if: github.event.action != 'closed'
         run: npm run build
         env:
-          BASE_URL: /expanse-docusaurus/pr-preview/pr-${{ github.event.number }}/
+          BASE_URL: /expanse-docs/pr-preview/pr-${{ github.event.number }}/
 
-      # Deploys the preview on opened/reopened/synchronize and removes it on
-      # close (merged or not). Leaves a sticky comment on the PR with the
-      # preview URL once the GitHub Pages deployment is live.
+      # Local composite action (.github/actions/pr-preview): deploys the
+      # preview on opened/reopened/synchronize and removes it on close
+      # (merged or not), keeping one sticky comment with the preview URL
+      # once the GitHub Pages deployment is live.
       - name: Deploy preview
-        uses: rossjrw/pr-preview-action@v1
+        if: github.event.action != 'closed'
+        uses: ./.github/actions/pr-preview
         with:
-          source-dir: build
-          preview-branch: gh-pages
-          umbrella-dir: pr-preview
-          qr-code: false
-          wait-for-pages-deployment: true
+          action: deploy
+          pages-base-url: https://sdsc.github.io/expanse-docs
+
+      - name: Remove preview
+        if: github.event.action == 'closed'
+        uses: ./.github/actions/pr-preview
+        with:
+          action: remove
+          pages-base-url: https://sdsc.github.io/expanse-docs

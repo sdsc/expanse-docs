@@ -41,10 +41,10 @@ Here are some common module commands and their descriptions:
 | `module list`                           | List the modules that are currently loaded                                        |
 | `module avail`                          | List the modules that are available in environment                                |
 | `module spider`                         | List of the modules and extensions currently available                            |
-| `module display <module_name>`          | Show the environment variables used by \<module name\> and how they are affected  |
-| `module unload <module name>`           | Remove \<module name\> from the environment                                       |
-| `module load <module name>`             | Load \<module name\> into the environment                                         |
-| `module swap <module one> <module two>` | Replace \<module one\> with \<module two\> in the environment                     |
+| `module display <module_name>`          | Show the environment variables used by `<module name>` and how they are affected  |
+| `module unload <module name>`           | Remove `<module name>` from the environment                                       |
+| `module load <module name>`             | Load `<module name>` into the environment                                         |
+| `module swap <module one> <module two>` | Replace `<module one>` with `<module two>` in the environment                     |
 
 ## Loading and unloading modules
 

@@ -4,7 +4,14 @@ A Docusaurus rebuild of the [SDSC Expanse User Guide](https://www.sdsc.edu/syste
 with all original content preserved and reorganized into a searchable docs site styled with
 [SDSC branding](https://www.sdsc.edu/about/brand.html) (navy `#182B49`, gold `#C69214`, Teko + Source Sans 3).
 
-**Live site:** https://zonca.github.io/expanse-docusaurus/
+**Live site:** https://sdsc.github.io/expanse-docs/
+
+## Search
+
+The site ships with full-text search in the navbar
+([@easyops-cn/docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local)):
+a fully offline search index built at deploy time, no external service
+(no Algolia account or crawler needed). The index covers all 14 guide pages.
 
 ## Contents
 
@@ -41,7 +48,13 @@ which builds the site and publishes it to the `gh-pages` branch (served by
 GitHub Pages). A separate [Lighthouse workflow](.github/workflows/lighthouse.yml)
 audits every page for accessibility (all pages currently score **100**).
 
+External links are guarded by the [broken-links workflow](.github/workflows/broken-links.yml)
+(lychee): it runs on changes to the docs, weekly on a Monday-morning schedule,
+and on demand.
+
 Every pull request automatically gets a temporary preview at
-`https://zonca.github.io/expanse-docusaurus/pr-preview/pr-<number>/`, posted
+`https://sdsc.github.io/expanse-docs/pr-preview/pr-<number>/`, posted
 as a comment on the PR. The preview updates on each push and is removed when
 the PR is closed or merged ([preview workflow](.github/workflows/pr-preview.yml)).
+Preview removal does not wait for the GitHub Pages build (it would race with
+the main-branch deploy triggered by the same merge).

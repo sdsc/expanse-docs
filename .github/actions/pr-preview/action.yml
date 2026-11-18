@@ -1,0 +1,173 @@
+name: PR Preview
+description: >
+  Publish or remove a per-PR preview directory on the GitHub Pages
+  publishing branch. Local composite action: plain git and gh, no
+  third-party code (replacement for rossjrw/pr-preview-action).
+
+inputs:
+  action:
+    description: '"deploy" to publish the preview, "remove" to delete it'
+    required: true
+  source-dir:
+    description: Directory containing the built site (deploy only)
+    required: false
+    default: build
+  preview-branch:
+    description: Branch the previews are published to
+    required: false
+    default: gh-pages
+  umbrella-dir:
+    description: Directory on the preview branch that holds all previews
+    required: false
+    default: pr-preview
+  pages-base-url:
+    description: Base URL of the GitHub Pages site, no trailing slash
+    required: true
+
+outputs:
+  preview-url:
+    description: URL of the preview (deploy only)
+    value: ${{ steps.deploy.outputs.preview-url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Publish or remove preview
+      id: deploy
+      shell: bash
+      env:
+        PR_NUMBER: ${{ github.event.number }}
+        ACTION_MODE: ${{ inputs.action }}
+        SOURCE_DIR: ${{ inputs.source-dir }}
+        PREVIEW_BRANCH: ${{ inputs.preview-branch }}
+        UMBRELLA_DIR: ${{ inputs.umbrella-dir }}
+        PAGES_BASE_URL: ${{ inputs.pages-base-url }}
+      run: |
+        set -euo pipefail
+
+        PREVIEW_PATH="$UMBRELLA_DIR/pr-$PR_NUMBER"
+        WORK="$RUNNER_TEMP/preview-publish"
+
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # Materialize the publishing branch in a worktree. The main checkout
+        # stays on the PR merge ref; its persisted credentials are shared by
+        # the worktree and used for the push below.
+        git fetch --force origin "$PREVIEW_BRANCH"
+        if git show-ref --verify --quiet "refs/remotes/origin/$PREVIEW_BRANCH"; then
+          git worktree add --detach "$WORK" "origin/$PREVIEW_BRANCH"
+        else
+          # First deploy ever: start the publishing branch as an orphan.
+          git worktree add --detach "$WORK"
+          git -C "$WORK" checkout --orphan "$PREVIEW_BRANCH"
+          git -C "$WORK" rm -rf --quiet . || true
+        fi
+
+        # deploy.yml on main and the preview jobs of other PRs push to the
+        # same branch: on a rejected push, rebase on the fresh remote state
+        # and retry.
+        push_with_retry() {
+          for attempt in 1 2 3; do
+            if git -C "$WORK" push origin "HEAD:$PREVIEW_BRANCH"; then
+              return 0
+            fi
+            git fetch --force origin "$PREVIEW_BRANCH"
+            if ! git -C "$WORK" rebase "origin/$PREVIEW_BRANCH"; then
+              git -C "$WORK" rebase --abort || true
+              echo "::error::Rebase conflict while updating $PREVIEW_BRANCH"
+              return 1
+            fi
+          done
+          echo "::error::Failed to push to $PREVIEW_BRANCH after 3 attempts"
+          return 1
+        }
+
+        if [ "$ACTION_MODE" = "deploy" ]; then
+          rm -rf "$WORK/$PREVIEW_PATH"
+          mkdir -p "$WORK/$PREVIEW_PATH"
+          cp -R "$GITHUB_WORKSPACE/$SOURCE_DIR/." "$WORK/$PREVIEW_PATH/"
+          # Lets the comment step wait for this exact build instead of any
+          # 200 on the preview URL, which a previous build already satisfies.
+          echo "$GITHUB_SHA" > "$WORK/$PREVIEW_PATH/pr-preview-version.txt"
+        else
+          rm -rf "$WORK/$PREVIEW_PATH"
+        fi
+
+        git -C "$WORK" add -A
+        if git -C "$WORK" diff --cached --quiet; then
+          echo "Nothing to change on $PREVIEW_BRANCH."
+        else
+          if [ "$ACTION_MODE" = "deploy" ]; then
+            git -C "$WORK" commit -m "Deploy preview for PR #$PR_NUMBER"
+          else
+            git -C "$WORK" commit -m "Remove preview for PR #$PR_NUMBER"
+          fi
+          push_with_retry
+        fi
+
+        if [ "$ACTION_MODE" = "deploy" ]; then
+          echo "preview-url=$PAGES_BASE_URL/$PREVIEW_PATH/" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Comment preview URL on the PR
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.number }}
+        PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
+        ACTION_MODE: ${{ inputs.action }}
+        GITHUB_SHA: ${{ github.sha }}
+      run: |
+        set -euo pipefail
+
+        # Locate the sticky comment once, for both deploy and remove.
+        # Capture all ids first and read the first line, so gh never gets
+        # SIGPIPE (which pipefail would turn into a failure) on busy PRs.
+        COMMENTS=$(gh api --paginate "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+          --jq '.[] | select(.body | contains("<!-- pr-preview-url -->")) | .id')
+        COMMENT_ID=""
+        if [ -n "$COMMENTS" ]; then
+          IFS= read -r COMMENT_ID <<< "$COMMENTS"
+        fi
+
+        if [ "$ACTION_MODE" = "remove" ]; then
+          BODY="Preview removed.
+        <!-- pr-preview-url -->"
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f body="$BODY" > /dev/null
+          fi
+          exit 0
+        fi
+
+        # The Pages build takes about a minute. Poll the version file that
+        # deploy wrote into the preview, so a previously deployed preview
+        # does not satisfy the wait on synchronize. Best effort: comment
+        # after 4 minutes even if the build is still running.
+        published=""
+        for attempt in $(seq 1 48); do
+          url="$PREVIEW_URL/pr-preview-version.txt?v=$(date +%s)-$attempt"
+          body=$(curl -fsS "$url" 2>/dev/null || true)
+          if [ "$body" = "$GITHUB_SHA" ]; then
+            published=1
+            break
+          fi
+          sleep 5
+        done
+        if [ -n "$published" ]; then
+          BODY="Preview: $PREVIEW_URL"
+        else
+          BODY="Preview (Pages build may still be running): $PREVIEW_URL"
+        fi
+        BODY="$BODY
+        <!-- pr-preview-url -->"
+
+        if [ -n "$COMMENT_ID" ]; then
+          gh api --method PATCH "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+            -f body="$BODY" > /dev/null
+        else
+          gh api --method POST "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+            -f body="$BODY" > /dev/null
+        fi
