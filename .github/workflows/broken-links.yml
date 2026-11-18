@@ -5,6 +5,9 @@ on:
   # so it must always report (a path-filtered required check never
   # reports on non-matching PRs and blocks merge).
   pull_request:
+  # merge_group keeps the required check reporting if a merge queue is
+  # ever enabled on this repository.
+  merge_group:
   push:
     branches:
       - main
@@ -13,7 +16,8 @@ on:
       - "README.md"
       - ".github/workflows/broken-links.yml"
   schedule:
-    # Weekly: Mondays 09:00 America/Los_Angeles (16:00/17:00 UTC, DST-dependent)
+    # Weekly on Mondays, 16:00 UTC year-round: 08:00 PST in winter,
+    # 09:00 PDT in summer.
     - cron: "0 16 * * 1"
   workflow_dispatch:
 
@@ -36,7 +40,7 @@ jobs:
       - name: Install lychee (pinned release)
         run: |
           set -euo pipefail
-          curl -sSfL -o lychee.tar.gz \
+          curl -sSfL --retry 3 --retry-delay 2 -o lychee.tar.gz \
             "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz"
           echo "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a  lychee.tar.gz" | sha256sum --check --strict -
           mkdir -p .lychee-bin

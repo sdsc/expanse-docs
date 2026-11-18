@@ -8,6 +8,10 @@ inputs:
   action:
     description: '"deploy" to publish the preview, "remove" to delete it'
     required: true
+  pr-number:
+    description: "PR number to publish or remove (defaults to the pull_request event number)"
+    required: false
+    default: ""
   source-dir:
     description: Directory containing the built site (deploy only)
     required: false
@@ -38,7 +42,7 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ github.event.number }}
+        PR_NUMBER: ${{ inputs.pr-number || github.event.number }}
         ACTION_MODE: ${{ inputs.action }}
         SOURCE_DIR: ${{ inputs.source-dir }}
         PREVIEW_BRANCH: ${{ inputs.preview-branch }}
@@ -55,8 +59,10 @@ runs:
 
         # Materialize the publishing branch in a worktree. The main checkout
         # stays on the PR merge ref; its persisted credentials are shared by
-        # the worktree and used for the push below.
-        git fetch --force origin "$PREVIEW_BRANCH"
+        # the worktree and used for the push below. The publishing branch may
+        # not exist yet (fresh repository, or it was recreated): tolerate the
+        # missing ref and start the branch as an orphan below.
+        git fetch --force origin "$PREVIEW_BRANCH" || true
         if git show-ref --verify --quiet "refs/remotes/origin/$PREVIEW_BRANCH"; then
           git worktree add --detach "$WORK" "origin/$PREVIEW_BRANCH"
         else
@@ -99,22 +105,30 @@ runs:
         git -C "$WORK" add -A
         if git -C "$WORK" diff --cached --quiet; then
           echo "Nothing to change on $PREVIEW_BRANCH."
+        elif [ "$ACTION_MODE" = "remove" ]; then
+          git -C "$WORK" commit -m "Remove preview for PR #$PR_NUMBER"
+          push_with_retry
         else
-          if [ "$ACTION_MODE" = "deploy" ]; then
-            git -C "$WORK" commit -m "Deploy preview for PR #$PR_NUMBER"
-          else
-            git -C "$WORK" commit -m "Remove preview for PR #$PR_NUMBER"
-          fi
-          if [ "$ACTION_MODE" = "deploy" ]; then
-            # A synchronize run can reach this point after the PR closed and
-            # its removal already ran: do not recreate the preview.
-            PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
-            if [ "$PR_STATE" != "open" ]; then
-              echo "PR #$PR_NUMBER is $PR_STATE; skipping preview push."
-              exit 0
-            fi
+          git -C "$WORK" commit -m "Deploy preview for PR #$PR_NUMBER"
+          # A deploy can reach this point after the PR closed and its
+          # removal already ran: do not (re)create the preview.
+          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          if [ "$PR_STATE" != "open" ]; then
+            echo "PR #$PR_NUMBER is $PR_STATE; skipping preview push."
+            exit 0
           fi
           push_with_retry
+          # The PR may have closed while the push was in flight; if so, undo
+          # the preview right away so no stale directory survives.
+          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          if [ "$PR_STATE" != "open" ]; then
+            echo "PR #$PR_NUMBER closed during the push; removing the preview."
+            rm -rf "$WORK/$PREVIEW_PATH"
+            git -C "$WORK" add -A
+            git -C "$WORK" commit -m "Remove preview for PR #$PR_NUMBER"
+            push_with_retry
+            exit 0
+          fi
         fi
 
         if [ "$ACTION_MODE" = "deploy" ]; then
@@ -126,7 +140,7 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ github.event.number }}
+        PR_NUMBER: ${{ inputs.pr-number || github.event.number }}
         PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
         ACTION_MODE: ${{ inputs.action }}
         GITHUB_SHA: ${{ github.sha }}

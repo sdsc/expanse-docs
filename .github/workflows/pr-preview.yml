@@ -7,55 +7,121 @@ on:
       - reopened
       - synchronize
       - closed
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: "PR number whose preview to remove"
+        required: true
 
+# One group per PR across all event types (opened, synchronize, close), so
+# a close cancels any in-flight deploy for the same PR instead of racing it.
+# (The pull_request event sets a different github.ref for closed events, so
+# a ref-based group does not have this property.)
 concurrency:
-  group: preview-${{ github.ref }}
+  group: preview-pr-${{ github.event.inputs.pr-number || github.event.number }}
   cancel-in-progress: true
 
 permissions:
   contents: write
   pull-requests: write
 
+env:
+  PAGES_BASE_URL: https://sdsc.github.io/expanse-docs
+
 jobs:
-  preview:
+  # Builds the PR site with a read-only token and no persisted credentials:
+  # PR code (npm lifecycle scripts) never sees a write token. Fork PRs only
+  # have a read-only token, so they skip previews entirely; the preview check
+  # is not required, so this does not block them.
+  build:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Node
-        if: github.event.action != 'closed'
         uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
 
       - name: Install dependencies
-        if: github.event.action != 'closed'
         run: npm ci
 
       # Build the PR with the preview base URL so that assets and internal
       # links resolve under /expanse-docs/pr-preview/pr-<number>/
       - name: Build website
-        if: github.event.action != 'closed'
         run: npm run build
         env:
           BASE_URL: /expanse-docs/pr-preview/pr-${{ github.event.number }}/
 
-      # Local composite action (.github/actions/pr-preview): deploys the
-      # preview on opened/reopened/synchronize and removes it on close
-      # (merged or not), keeping one sticky comment with the preview URL
-      # once the GitHub Pages deployment is live.
+      - name: Upload preview site
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-site
+          path: build
+          if-no-files-found: error
+          retention-days: 1
+
+  # Publishes from the base branch: the composite action that runs here is
+  # always the reviewed main version, never the PR's own modification of it.
+  # Runs after a successful build (deploy) or without one (remove on close,
+  # or a manual cleanup via workflow_dispatch).
+  publish:
+    if: >-
+      always() &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository))
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (base branch)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.ref || github.ref }}
+
+      - name: Download preview site
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        uses: actions/download-artifact@v8
+        with:
+          name: preview-site
+          path: preview-download
+
+      # The artifact root may or may not carry the build/ prefix depending
+      # on the uploader; place the site at ./build either way.
+      - name: Place preview site
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: |
+          set -euo pipefail
+          rm -rf build
+          if [ -d preview-download/build ]; then
+            mv preview-download/build build
+          else
+            mv preview-download build
+          fi
+
       - name: Deploy preview
-        if: github.event.action != 'closed'
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
         uses: ./.github/actions/pr-preview
         with:
           action: deploy
-          pages-base-url: https://sdsc.github.io/expanse-docs
+          pr-number: ${{ github.event.number }}
+          pages-base-url: ${{ env.PAGES_BASE_URL }}
 
       - name: Remove preview
-        if: github.event.action == 'closed'
+        if: github.event_name == 'workflow_dispatch' || github.event.action == 'closed'
         uses: ./.github/actions/pr-preview
         with:
           action: remove
-          pages-base-url: https://sdsc.github.io/expanse-docs
+          pr-number: ${{ inputs.pr-number || github.event.number }}
+          pages-base-url: ${{ env.PAGES_BASE_URL }}
