@@ -9,7 +9,7 @@ on:
       - closed
   workflow_dispatch:
     inputs:
-      pr-number:
+      pr_number:
         description: "PR number whose preview to remove"
         required: true
 
@@ -18,7 +18,7 @@ on:
 # (The pull_request event sets a different github.ref for closed events, so
 # a ref-based group does not have this property.)
 concurrency:
-  group: preview-pr-${{ github.event.inputs.pr-number || github.event.number }}
+  group: preview-pr-${{ github.event.inputs.pr_number || github.event.number }}
   cancel-in-progress: true
 
 permissions:
@@ -33,7 +33,11 @@ jobs:
   # PR code (npm lifecycle scripts) never sees a write token. Fork PRs only
   # have a read-only token, so they skip previews entirely; the preview check
   # is not required, so this does not block them.
-  build:
+  #
+  # The job id is preview_build (not build) on purpose: a check run named
+  # "build" would also match the required "build" status check, giving a
+  # preview-only failure veto power over merges.
+  preview_build:
     if: >-
       github.event_name == 'pull_request' &&
       github.event.action != 'closed' &&
@@ -75,14 +79,14 @@ jobs:
   # always the reviewed main version, never the PR's own modification of it.
   # Runs after a successful build (deploy) or without one (remove on close,
   # or a manual cleanup via workflow_dispatch).
-  publish:
+  preview_publish:
     if: >-
       always() &&
-      (needs.build.result == 'success' || needs.build.result == 'skipped') &&
+      (needs.preview_build.result == 'success' || needs.preview_build.result == 'skipped') &&
       (github.event_name == 'workflow_dispatch' ||
        (github.event_name == 'pull_request' &&
         github.event.pull_request.head.repo.full_name == github.repository))
-    needs: build
+    needs: preview_build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (base branch)
@@ -109,13 +113,17 @@ jobs:
           else
             mv preview-download build
           fi
+          if [ ! -f build/index.html ]; then
+            echo "::error::The preview artifact does not contain build/index.html"
+            exit 1
+          fi
 
       - name: Deploy preview
         if: github.event_name == 'pull_request' && github.event.action != 'closed'
         uses: ./.github/actions/pr-preview
         with:
           action: deploy
-          pr-number: ${{ github.event.number }}
+          pr_number: ${{ github.event.number }}
           pages-base-url: ${{ env.PAGES_BASE_URL }}
 
       - name: Remove preview
@@ -123,5 +131,5 @@ jobs:
         uses: ./.github/actions/pr-preview
         with:
           action: remove
-          pr-number: ${{ inputs.pr-number || github.event.number }}
+          pr_number: ${{ inputs.pr_number || github.event.number }}
           pages-base-url: ${{ env.PAGES_BASE_URL }}

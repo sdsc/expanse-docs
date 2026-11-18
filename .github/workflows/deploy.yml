@@ -62,6 +62,8 @@ jobs:
           rsync -a --delete --exclude='.git' --exclude='pr-preview' \
             --exclude='CNAME' --exclude='.nojekyll' \
             build/ "$RUNNER_TEMP/pages/"
+          # Serve the branch without running Jekyll over it (also faster).
+          touch "$RUNNER_TEMP/pages/.nojekyll"
           cd "$RUNNER_TEMP/pages"
           git add -A
           if git diff --cached --quiet; then

@@ -8,7 +8,7 @@ inputs:
   action:
     description: '"deploy" to publish the preview, "remove" to delete it'
     required: true
-  pr-number:
+  pr_number:
     description: "PR number to publish or remove (defaults to the pull_request event number)"
     required: false
     default: ""
@@ -42,7 +42,7 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ inputs.pr-number || github.event.number }}
+        PR_NUMBER: ${{ inputs.pr_number || github.event.number }}
         ACTION_MODE: ${{ inputs.action }}
         SOURCE_DIR: ${{ inputs.source-dir }}
         PREVIEW_BRANCH: ${{ inputs.preview-branch }}
@@ -119,8 +119,10 @@ runs:
           fi
           push_with_retry
           # The PR may have closed while the push was in flight; if so, undo
-          # the preview right away so no stale directory survives.
-          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          # the preview right away so no stale directory survives. Best
+          # effort: on a transient API failure assume the PR is still open
+          # rather than failing the job after a successful deploy.
+          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state 2>/dev/null || echo open)
           if [ "$PR_STATE" != "open" ]; then
             echo "PR #$PR_NUMBER closed during the push; removing the preview."
             rm -rf "$WORK/$PREVIEW_PATH"
@@ -140,7 +142,7 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ inputs.pr-number || github.event.number }}
+        PR_NUMBER: ${{ inputs.pr_number || github.event.number }}
         PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
         ACTION_MODE: ${{ inputs.action }}
         GITHUB_SHA: ${{ github.sha }}
@@ -148,9 +150,10 @@ runs:
         set -euo pipefail
 
         # Do not comment on a preview when the PR closed while the deploy
-        # was running; the removal run updates the comment instead.
+        # was running; the removal run updates the comment instead. Best
+        # effort: on a transient API failure assume the PR is still open.
         if [ "$ACTION_MODE" = "deploy" ]; then
-          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          PR_STATE=$(gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" --jq .state 2>/dev/null || echo open)
           if [ "$PR_STATE" != "open" ]; then
             echo "PR #$PR_NUMBER is $PR_STATE; not commenting on a preview."
             exit 0
