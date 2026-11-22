@@ -67,6 +67,9 @@ const config = {
           // Adds an "Edit this page" button on every doc page,
           // linking straight to the file on GitHub
           editUrl: "https://github.com/sdsc/expanse-docs/edit/main/",
+          // "Last updated on ..." per page, from the file's git history
+          // (CI checkouts use fetch-depth: 0 so the history is available)
+          showLastUpdateTime: true,
           rehypePlugins: [rehypeWrapTables],
         },
         blog: false,
