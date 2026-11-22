@@ -24,8 +24,11 @@ on:
 permissions:
   contents: read
 
+# Key the group by event name as well: the weekly scheduled run shares
+# refs/heads/main with push-triggered runs, and the two should not cancel
+# each other.
 concurrency:
-  group: broken-links-${{ github.ref }}
+  group: broken-links-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
