@@ -187,7 +187,9 @@ runs:
         published=""
         for attempt in $(seq 1 48); do
           url="$PREVIEW_URL/pr-preview-version.txt?v=$(date +%s)-$attempt"
-          body=$(curl -fsS "$url" 2>/dev/null || true)
+          # --max-time bounds each request, so a single hung connection
+          # cannot stall the step well past the intended 4 minute window.
+          body=$(curl -fsS --max-time 10 "$url" 2>/dev/null || true)
           if [ "$body" = "$GITHUB_SHA" ]; then
             published=1
             break
