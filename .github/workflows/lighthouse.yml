@@ -40,10 +40,10 @@ jobs:
       - name: Build website
         run: npm run build
 
-      - name: Prepare site under baseUrl path for Lighthouse
+      - name: Prepare site for Lighthouse
         run: |
           mkdir -p lighthouse-site
-          cp -r build lighthouse-site/expanse-docs
+          cp -r build/. lighthouse-site/
 
       # Lighthouse CI runs from the pinned @lhci/cli devDependency instead
       # of a third-party action wrapper. The runner's preinstalled Chrome

@@ -60,10 +60,11 @@ jobs:
             git -C "$RUNNER_TEMP/pages" rm -rf --quiet . || true
           fi
           # --delete prunes files from the previous deploy, but never the
-          # worktree's .git, the PR preview directories, or the Pages-managed
-          # special files (CNAME for a custom domain, .nojekyll).
+          # worktree's .git, the PR preview directories, or .nojekyll.
+          # The custom-domain file ships in the build (static/CNAME), so
+          # rsync manages it together with the rest of the site.
           rsync -a --delete --exclude='.git' --exclude='pr-preview' \
-            --exclude='CNAME' --exclude='.nojekyll' \
+            --exclude='.nojekyll' \
             build/ "$RUNNER_TEMP/pages/"
           # Serve the branch without running Jekyll over it (also faster).
           touch "$RUNNER_TEMP/pages/.nojekyll"

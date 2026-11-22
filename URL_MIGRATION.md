@@ -18,25 +18,26 @@ the page URL plus these 14 anchors is the complete old URL space.
 
 | Old URL | Section | New URL |
 | --- | --- | --- |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html` | (whole guide) | `https://sdsc.github.io/expanse-docs/` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-1` | Technical Summary | `https://sdsc.github.io/expanse-docs/` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-2` | System Access | `https://sdsc.github.io/expanse-docs/system-access` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-3` | Modules | `https://sdsc.github.io/expanse-docs/modules` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-4` | Account Management | `https://sdsc.github.io/expanse-docs/account-management` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-5` | Job Charging | `https://sdsc.github.io/expanse-docs/job-charging` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-6` | Compiling Codes | `https://sdsc.github.io/expanse-docs/compiling` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-7` | Running Jobs on Expanse | `https://sdsc.github.io/expanse-docs/running-jobs` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-8` | Using GPU Nodes | `https://sdsc.github.io/expanse-docs/gpu-nodes` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-9` | Data Movement | `https://sdsc.github.io/expanse-docs/data-movement` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-10` | Storage | `https://sdsc.github.io/expanse-docs/storage` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-11` | Expanse AI Resource | `https://sdsc.github.io/expanse-docs/expanse-ai` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-12` | Composable Systems | `https://sdsc.github.io/expanse-docs/composable-systems` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-13` | Software | `https://sdsc.github.io/expanse-docs/software` |
-| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-14` | Citations & Publications | `https://sdsc.github.io/expanse-docs/citations` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html` | (whole guide) | `https://expanse.sdsc.edu/` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-1` | Technical Summary | `https://expanse.sdsc.edu/` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-2` | System Access | `https://expanse.sdsc.edu/system-access` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-3` | Modules | `https://expanse.sdsc.edu/modules` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-4` | Account Management | `https://expanse.sdsc.edu/account-management` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-5` | Job Charging | `https://expanse.sdsc.edu/job-charging` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-6` | Compiling Codes | `https://expanse.sdsc.edu/compiling` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-7` | Running Jobs on Expanse | `https://expanse.sdsc.edu/running-jobs` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-8` | Using GPU Nodes | `https://expanse.sdsc.edu/gpu-nodes` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-9` | Data Movement | `https://expanse.sdsc.edu/data-movement` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-10` | Storage | `https://expanse.sdsc.edu/storage` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-11` | Expanse AI Resource | `https://expanse.sdsc.edu/expanse-ai` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-12` | Composable Systems | `https://expanse.sdsc.edu/composable-systems` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-13` | Software | `https://expanse.sdsc.edu/software` |
+| `https://www.sdsc.edu/systems/expanse/user_guide.html#narrow-wysiwyg-14` | Citations & Publications | `https://expanse.sdsc.edu/citations` |
 
 Each mapping was verified in two directions: the section heading of every old
 anchor matches the title of the target page, and every target URL returns 200
-on the live site.
+on the live site (paths verified under the previous sdsc.github.io address;
+re-verify under the custom domain when it goes live).
 
 ## Notes
 

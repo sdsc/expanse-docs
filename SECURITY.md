@@ -16,7 +16,7 @@ Please do not open public GitHub issues for security problems.
 ## Scope
 
 This repository publishes a static documentation site
-(<https://sdsc.github.io/expanse-docs/>) built with Docusaurus and deployed
+(<https://expanse.sdsc.edu/>) built with Docusaurus and deployed
 through GitHub Actions to GitHub Pages. Issues in the site content, the
 build workflows, or the published pages are in scope. Operational problems
 with the Expanse system itself should go to the

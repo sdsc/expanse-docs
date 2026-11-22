@@ -8,7 +8,7 @@ import { visit } from "unist-util-visit";
 
 // PR preview builds serve the site under /pr-preview/pr-<number>/, so the
 // base URL is overridable at build time (see .github/workflows/pr-preview.yml).
-const baseUrl = process.env.BASE_URL || "/expanse-docs/";
+const baseUrl = process.env.BASE_URL || "/";
 
 /**
  * Wrap markdown tables in a scrollable div so wide tables scroll
@@ -43,8 +43,9 @@ const config = {
   tagline: "Documentation for the Expanse supercomputer at SDSC",
   favicon: "img/favicon.ico",
 
-  // GitHub Pages deployment config
-  url: "https://sdsc.github.io",
+  // Custom domain (static/CNAME); GitHub Pages redirects the previous
+  // sdsc.github.io/expanse-docs address here once the domain is configured.
+  url: "https://expanse.sdsc.edu",
   baseUrl: baseUrl,
   organizationName: "sdsc",
   projectName: "expanse-docs",
