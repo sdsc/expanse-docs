@@ -28,7 +28,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/types": "3.10.2",
-    "@lhci/cli": "0.15.1"
+    "@lhci/cli": "0.16.1"
   },
   "browserslist": {
     "production": [
