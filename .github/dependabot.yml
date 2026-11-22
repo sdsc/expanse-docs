@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Docusaurus packages are pinned to one version and must move together,
+  # so they are grouped into a single PR.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+    commit-message:
+      prefix: "deps"
+  # Keeps the first-party actions (pinned by commit SHA, tag kept in the
+  # trailing comment) up to date.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
