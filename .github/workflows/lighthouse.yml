@@ -12,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# Same shape as build.yml and broken-links.yml: a new push to the same ref
+# cancels the superseded run instead of stacking ~4 minute Lighthouse runs.
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
