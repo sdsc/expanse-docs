@@ -4,7 +4,7 @@ A Docusaurus rebuild of the [SDSC Expanse User Guide](https://www.sdsc.edu/syste
 with all original content preserved and reorganized into a searchable docs site styled with
 [SDSC branding](https://www.sdsc.edu/about/brand.html) (navy `#182B49`, gold `#C69214`, Teko + Source Sans 3).
 
-**Live site:** https://sdsc.github.io/expanse-docs/
+**Live site:** https://expanse.sdsc.edu/
 
 ## Search
 
@@ -53,7 +53,7 @@ External links are guarded by the [broken-links workflow](.github/workflows/brok
 and on demand.
 
 Every pull request automatically gets a temporary preview at
-`https://sdsc.github.io/expanse-docs/pr-preview/pr-<number>/`, posted
+`https://expanse.sdsc.edu/pr-preview/pr-<number>/`, posted
 as a comment on the PR. The preview updates on each push and is removed when
 the PR is closed or merged ([preview workflow](.github/workflows/pr-preview.yml)).
 Preview removal does not wait for the GitHub Pages build (it would race with
