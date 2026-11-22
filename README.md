@@ -58,3 +58,9 @@ as a comment on the PR. The preview updates on each push and is removed when
 the PR is closed or merged ([preview workflow](.github/workflows/pr-preview.yml)).
 Preview removal does not wait for the GitHub Pages build (it would race with
 the main-branch deploy triggered by the same merge).
+
+## License
+
+The documentation content in this repository is licensed under the
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/)
+license; see [LICENSE](LICENSE) for the full text.

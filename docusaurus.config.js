@@ -140,6 +140,10 @@ const config = {
                 href: "https://github.com/sdsc/expanse-docs",
               },
               {
+                label: "License: CC BY 4.0",
+                href: "https://github.com/sdsc/expanse-docs/blob/main/LICENSE",
+              },
+              {
                 label: "SDSC Support",
                 href: "https://www.sdsc.edu/support/index.html",
               },
